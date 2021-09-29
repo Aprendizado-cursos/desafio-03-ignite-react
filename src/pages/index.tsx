@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { GetStaticProps } from 'next';
 
 import { getPrismicClient } from '../services/prismic';
@@ -24,9 +25,9 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home() {
+export default function Home(): JSX.Element {
   // TODO
-  return <div>Oi</div>;
+  return <h1>oi</h1>;
 }
 
 // export const getStaticProps = async () => {
