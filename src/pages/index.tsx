@@ -5,6 +5,7 @@ import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import Post from '../components/Post';
 
 interface Post {
   uid?: string;
@@ -27,7 +28,7 @@ interface HomeProps {
 
 export default function Home(): JSX.Element {
   // TODO
-  return <h1>oi</h1>;
+  return <Post />;
 }
 
 // export const getStaticProps = async () => {
