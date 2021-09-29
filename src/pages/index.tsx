@@ -28,7 +28,14 @@ interface HomeProps {
 
 export default function Home(): JSX.Element {
   // TODO
-  return <Post />;
+  return (
+    <>
+      <Post />
+      <Post />
+      <Post />
+      <Post />
+    </>
+  );
 }
 
 // export const getStaticProps = async () => {
