@@ -1,11 +1,8 @@
-import Head from 'next/head';
+import Prismic from '@prismicio/client';
 import { GetStaticProps } from 'next';
-
-import { getPrismicClient } from '../services/prismic';
-
-import commonStyles from '../styles/common.module.scss';
-import styles from './home.module.scss';
+import { RichText } from 'prismic-dom';
 import Post from '../components/Post';
+import { getPrismicClient } from '../services/prismic';
 
 interface Post {
   uid?: string;
@@ -26,21 +23,51 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home(): JSX.Element {
+export default function Home({ postsPagination }: HomeProps): JSX.Element {
   // TODO
   return (
     <>
-      <Post />
-      <Post />
-      <Post />
-      <Post />
+      {postsPagination.results.map((post: Post) => (
+        <Post key={post.uid} />
+      ))}
     </>
   );
 }
 
-// export const getStaticProps = async () => {
-// const prismic = getPrismicClient();
-// const postsResponse = await prismic.query(TODO);
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
+  const postsResponse = await prismic.query(
+    [Prismic.predicates.at('document.type', 'main')],
+    {
+      fetch: [
+        'posts.title',
+        'posts.content',
+        'posts.author',
+        'posts.subtitle',
+        'posts.banner.url',
+      ],
+      pageSize: 100,
+    }
+  );
 
-// TODO
-// };
+  console.log(postsResponse);
+
+  const posts: Post[] = postsResponse.results.map(post => {
+    return {
+      uid: post.uid,
+      first_publication_date: post.first_publication_date,
+      data: {
+        title: RichText.asText(post.data.title),
+        author: RichText.asText(post.data.author),
+        subtitle: RichText.asText(post.data.subtitle),
+      },
+    };
+  });
+
+  const postsPagination: PostPagination = {
+    results: posts,
+    next_page: postsResponse.next_page,
+  };
+
+  return { props: { postsPagination } };
+};
