@@ -1,1 +1,14 @@
-// TODO
+.container {
+  button {
+    color: var(--Highlight);
+    background: transparent;
+    border: none;
+    font-weight: bold;
+
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: opacity(0.8);
+    }
+  }
+}

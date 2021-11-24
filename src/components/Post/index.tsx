@@ -2,16 +2,23 @@ import { FiCalendar } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
 import styles from './header.module.scss';
 
-export default function Post(): JSX.Element {
+interface PostProps {
+  title: string;
+  subtitle: string;
+  author: string;
+  date: string;
+}
+
+export default function Post({ ...props }: PostProps): JSX.Element {
   return (
     <article className={styles.container}>
-      <h1>Como utilizar Hooks</h1>
-      <h2>Pensando em sincronização em vez de ciclos de vida</h2>
+      <h1>{props.title}</h1>
+      <h2>{props.subtitle}</h2>
       <div>
         <FiCalendar />
-        <span>15 Mar 2021</span>
+        <span>{props.date}</span>
         <FiUser />
-        <span>Joseph Oliveira</span>
+        <span>{props.author}</span>
       </div>
     </article>
   );

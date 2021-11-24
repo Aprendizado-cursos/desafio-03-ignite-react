@@ -1,9 +1,10 @@
 import Prismic from '@prismicio/client';
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import { GetStaticProps } from 'next';
-import { RichText } from 'prismic-dom';
 import Post from '../components/Post';
 import { getPrismicClient } from '../services/prismic';
-
+import styles from './home.module.scss';
 interface Post {
   uid?: string;
   first_publication_date: string | null;
@@ -24,42 +25,48 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
-  // TODO
   return (
-    <>
+    <section className={styles.container}>
       {postsPagination.results.map((post: Post) => (
-        <Post key={post.uid} />
+        <Post
+          key={post.uid}
+          title={post.data.title}
+          author={post.data.author}
+          subtitle={post.data.subtitle}
+          date={post.first_publication_date}
+        />
       ))}
-    </>
+      {postsPagination.next_page && (
+        <button type="button" onClick={() => {}}>
+          Carregar mais posts
+        </button>
+      )}
+    </section>
   );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
   const postsResponse = await prismic.query(
-    [Prismic.predicates.at('document.type', 'main')],
+    [Prismic.predicates.at('document.type', 'posts')],
     {
-      fetch: [
-        'posts.title',
-        'posts.content',
-        'posts.author',
-        'posts.subtitle',
-        'posts.banner.url',
-      ],
-      pageSize: 100,
+      fetch: ['posts.title', 'posts.author', 'posts.subtitle'],
+      pageSize: 2,
     }
   );
-
-  console.log(postsResponse);
 
   const posts: Post[] = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: post.first_publication_date,
+      first_publication_date: format(
+        new Date(post.first_publication_date),
+        'dd LLL yyyy',
+        { locale: ptBR }
+      ),
       data: {
-        title: RichText.asText(post.data.title),
-        author: RichText.asText(post.data.author),
-        subtitle: RichText.asText(post.data.subtitle),
+        title: post.data.title,
+        author: post.data.author,
+        subtitle: post.data.subtitle,
       },
     };
   });
@@ -68,6 +75,8 @@ export const getStaticProps: GetStaticProps = async () => {
     results: posts,
     next_page: postsResponse.next_page,
   };
+
+  console.log(postsPagination);
 
   return { props: { postsPagination } };
 };
