@@ -2,9 +2,11 @@ import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { GetStaticProps } from 'next';
+import { useState } from 'react';
 import Post from '../components/Post';
 import { getPrismicClient } from '../services/prismic';
 import styles from './home.module.scss';
+
 interface Post {
   uid?: string;
   first_publication_date: string | null;
@@ -25,9 +27,42 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
+  const [postsPaginationCopy, setPostsPaginationCopy] =
+    useState(postsPagination);
+
+  async function handleLoadMorePosts(): Promise<void> {
+    fetch(postsPagination.next_page, { method: 'GET' })
+      .then(response => response.json())
+      .then(json => {
+        const newPosts: Post[] = json.results.map(post => {
+          return {
+            uid: post.uid,
+            first_publication_date: format(
+              new Date(post.first_publication_date),
+              'dd LLL yyyy',
+              { locale: ptBR }
+            ),
+            data: {
+              title: post.data.title,
+              author: post.data.author,
+              subtitle: post.data.subtitle,
+            },
+          };
+        });
+
+        const newPostsPagination: PostPagination = {
+          results: [...postsPaginationCopy.results, ...newPosts],
+          next_page: json.next_page,
+        };
+
+        setPostsPaginationCopy(newPostsPagination);
+      })
+      .catch(err => console.log(err.message));
+  }
+
   return (
     <section className={styles.container}>
-      {postsPagination.results.map((post: Post) => (
+      {postsPaginationCopy.results.map((post: Post) => (
         <Post
           key={post.uid}
           title={post.data.title}
@@ -36,8 +71,8 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
           date={post.first_publication_date}
         />
       ))}
-      {postsPagination.next_page && (
-        <button type="button" onClick={() => {}}>
+      {postsPaginationCopy.next_page && (
+        <button type="button" onClick={handleLoadMorePosts}>
           Carregar mais posts
         </button>
       )}
@@ -75,8 +110,6 @@ export const getStaticProps: GetStaticProps = async () => {
     results: posts,
     next_page: postsResponse.next_page,
   };
-
-  console.log(postsPagination);
 
   return { props: { postsPagination } };
 };
