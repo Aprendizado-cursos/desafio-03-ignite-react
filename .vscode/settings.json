@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "PostCard",
-        "Page: Home"
+        "Page: Home",
+        "Component: Post"
     ]
 }
