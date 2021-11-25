@@ -1,1 +1,47 @@
-// TODO
+.container {
+  img {
+    margin-top: 2rem;
+    width: 100%;
+    height: 400px;
+  }
+
+  header,
+  main {
+    margin: 2rem 26% 0rem 26%;
+  }
+
+  header {
+    h1 {
+      color: var(--Heading);
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    div {
+      display: flex;
+      align-items: center;
+
+      color: var(--Info);
+
+      svg {
+        margin-right: 0.5rem;
+      }
+      span {
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  main {
+    margin-bottom: 2rem;
+
+    h1 {
+      margin: 1.5rem 0;
+    }
+
+    p {
+      text-align: justify;
+      line-height: 2;
+    }
+  }
+}

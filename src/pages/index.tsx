@@ -2,6 +2,7 @@ import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { GetStaticProps } from 'next';
+import Link from 'next/link';
 import { useState } from 'react';
 import Post from '../components/Post';
 import { getPrismicClient } from '../services/prismic';
@@ -57,19 +58,27 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 
         setPostsPaginationCopy(newPostsPagination);
       })
+      // eslint-disable-next-line no-console
       .catch(err => console.log(err.message));
   }
 
   return (
     <section className={styles.container}>
       {postsPaginationCopy.results.map((post: Post) => (
-        <Post
-          key={post.uid}
-          title={post.data.title}
-          author={post.data.author}
-          subtitle={post.data.subtitle}
-          date={post.first_publication_date}
-        />
+        <Link href={`/post/${post.uid}`} key={post.uid}>
+          <a>
+            <Post
+              title={post.data.title}
+              author={post.data.author}
+              subtitle={post.data.subtitle}
+              date={format(
+                new Date(post.first_publication_date),
+                'dd LLL yyyy',
+                { locale: ptBR }
+              )}
+            />
+          </a>
+        </Link>
       ))}
       {postsPaginationCopy.next_page && (
         <button type="button" onClick={handleLoadMorePosts}>
@@ -93,11 +102,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const posts: Post[] = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: format(
-        new Date(post.first_publication_date),
-        'dd LLL yyyy',
-        { locale: ptBR }
-      ),
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         author: post.data.author,
